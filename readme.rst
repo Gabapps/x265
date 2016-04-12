@@ -31,8 +31,8 @@ Profiling tools
 ---------------
 
 I am using different tools to profile x265 :
-* To acquire processor times : `papilib <http://icl.cs.utk.edu/papi/>`_
-* To analyse profiling data : `numpy <http://www.numpy.org/>`_ and `matplotlib<http://matplotlib.org/>`_
+* To acquire processor times : `papilib <http://icl.cs.utk.edu/papi/>`_ 
+* To analyse profiling data : `numpy <http://www.numpy.org/>`_ and `matplotlib <http://matplotlib.org/>`_ 
 
 x265 configuration
 ------------------
