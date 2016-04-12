@@ -31,24 +31,24 @@ Profiling tools
 ---------------
 
 I am using different tools to profile x265 :
-* To acquire processor times : `papilib <http://icl.cs.utk.edu/papi/>`
-* To analyse profiling data : `numpy <http://www.numpy.org/>` and `matplotlib<http://matplotlib.org/>`
+* To acquire processor times : `papilib <http://icl.cs.utk.edu/papi/>`_
+* To analyse profiling data : `numpy <http://www.numpy.org/>`_ and `matplotlib<http://matplotlib.org/>`_
 
 x265 configuration
 ------------------
 
-* No wavefront : ```--no-wpp```
-* Full-intra : ```-I 1```
-* Presets : ```-p <preset-number[0-9]>```
+* No wavefront : ``--no-wpp``
+* Full-intra : ``-I 1``
+* Presets : ``-p <preset-number[0-9]>``
 
 Call hierarchies for full-intra encoding
 --------------------------------------
 
-* ```FrameEncoder::compressFrame```
-   * ```FrameEncoder::processRowEncoder```
-      * ```Analysis::compressCTU``` : Compress an entire CTU
-         * ```Analysis::compressIntraCU``` : Find best encoding mode before encoding (RDO)
+* ``FrameEncoder::compressFrame``
+   * ``FrameEncoder::processRowEncoder``
+      * ``Analysis::compressCTU`` : Compress an entire CTU
+         * ``Analysis::compressIntraCU`` : Find best encoding mode before encoding (RDO)
 
-For the moment, most of the profiling job is done in ```Analysis::compressIntraCU``` (source/encoder/analysis.cpp)
+For the moment, most of the profiling job is done in ``Analysis::compressIntraCU`` (source/encoder/analysis.cpp)
 
 
