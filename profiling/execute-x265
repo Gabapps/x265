@@ -2,20 +2,31 @@
 
 X265_PATH=../build/eclipse-cdt4-debug/
 VIDEOS_PATH=../video/
+RESULTS_PATH=results/
 
 VIDEO_NAME=RaceHorses
 VIDEO_RES=416x240
 VIDEO_FPS=30
 
-rm profiling*.txt
+N=20
 
-for i in {2..9}
+rm profiling*.txt 2> /dev/null
+mkdir ${RESULTS_PATH}$VIDEO_NAME 2> /dev/null
+rm ${RESULTS_PATH}${VIDEO_NAME}/* -r
+
+for i in {0..9}
 do
 echo "Preset $i"
+mkdir ${RESULTS_PATH}${VIDEO_NAME}/${i} 2> /dev/null
+for j in {1..20}
+do
+echo "iteration $j"
+mkdir ${RESULTS_PATH}${VIDEO_NAME}/${i}/it${j} 2> /dev/null
+
 ${X265_PATH}x265 ${VIDEOS_PATH}${VIDEO_NAME}_${VIDEO_RES}_${VIDEO_FPS}.yuv ${VIDEOS_PATH}out.hevc --input-res $VIDEO_RES  -I 1 --fps $VIDEO_FPS -p $i --no-wpp --log-level 0
 #./x265 ../video/BasketballDrive_1920x1080_50.yuv ../video/out.hevc --input-res 1920x1080  -I 1 --fps 50 -p $i --no-wpp --log-level 0
-mkdir ${i}
-mv profiling*.txt ${i}
+mv profiling*.txt ${RESULTS_PATH}${VIDEO_NAME}/${i}/it${j}
 #./x265 ../video/simple_test.yuv ../video/out.hevc --input-res 256x256  -I 1 --fps 1 -p $1 --no-wpp --log-level 0
+done
 done
 #../../../profileread
