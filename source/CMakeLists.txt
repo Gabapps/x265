@@ -38,6 +38,8 @@ configure_file("${PROJECT_SOURCE_DIR}/x265_config.h.in"
 
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 
+find_package(PAPI REQUIRED)
+
 # System architecture detection
 string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYSPROC)
 set(X86_ALIASES x86 i386 i686 x86_64 amd64)
@@ -75,6 +77,7 @@ else()
 endif()
 
 if(UNIX)
+	include_directories(${PAPI_INCLUDE_DIRS})
     list(APPEND PLATFORM_LIBS pthread)
     find_library(LIBRT rt)
     if(LIBRT)
@@ -498,7 +501,7 @@ if(ENABLE_SHARED)
     if(EXTRA_LIB)
         target_link_libraries(x265-shared ${EXTRA_LIB})
     endif()
-    target_link_libraries(x265-shared ${PLATFORM_LIBS})
+    target_link_libraries(x265-shared ${PAPI_LIBRARIES} ${PLATFORM_LIBS})
     if(MSVC)
         set_target_properties(x265-shared PROPERTIES OUTPUT_NAME libx265)
     else()

@@ -23,6 +23,9 @@
 * For more information, contact us at license @ x265.com.
 *****************************************************************************/
 
+#define PROFILING
+#include "Profiling.h"
+
 #include "common.h"
 #include "frame.h"
 #include "framedata.h"
@@ -77,6 +80,10 @@ Analysis::Analysis()
 }
 bool Analysis::create(ThreadLocalData *tld)
 {
+#ifdef PROFILING
+	profile_open();
+#endif
+
     m_tld = tld;
     m_bTryLossless = m_param->bCULossless && !m_param->bLossless && m_param->rdLevel >= 2;
 
@@ -111,6 +118,10 @@ bool Analysis::create(ThreadLocalData *tld)
 
 void Analysis::destroy()
 {
+#ifdef PROFILING
+	profile_close();
+#endif
+
     for (uint32_t i = 0; i <= g_maxCUDepth; i++)
     {
         m_modeDepth[i].cuMemPool.destroy();
@@ -168,6 +179,8 @@ Mode& Analysis::compressCTU(CUData& ctu, Frame& frame, const CUGeom& cuGeom, con
             memcpy(ctu.m_chromaIntraDir, &intraDataCTU->chromaModes[ctu.m_cuAddr * numPartition], sizeof(uint8_t) * numPartition);
         }
         compressIntraCU(ctu, cuGeom, qp);
+
+        profile_write();
     }
     else
     {
@@ -282,6 +295,9 @@ void Analysis::qprdRefine(const CUData& parentCTU, const CUGeom& cuGeom, int32_t
 
 void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, int32_t qp)
 {
+#ifdef PROFILING
+	long_long t1 = PAPI_get_virt_usec(), time = 0;
+#endif
     uint32_t depth = cuGeom.depth;
     ModeDepth& md = m_modeDepth[depth];
     md.bestMode = NULL;
@@ -357,7 +373,15 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
                 if (m_slice->m_pps->bUseDQP && nextDepth <= m_slice->m_pps->maxCuDQPDepth)
                     nextQP = setLambdaFromQP(parentCTU, calculateQpforCuSize(parentCTU, childGeom));
 
+#ifdef PROFILING
+                time += PAPI_get_virt_usec() - t1;
+#endif
+
                 compressIntraCU(parentCTU, childGeom, nextQP);
+
+#ifdef PROFILING
+                t1 = PAPI_get_virt_usec();
+#endif
 
                 // Save best CU and pred data for this sub CU
                 splitCU->copyPartFrom(nd.bestMode->cu, childGeom, subPartIdx);
@@ -383,6 +407,21 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
 
         checkDQPForSplitPred(*splitPred, cuGeom);
         checkBestMode(*splitPred, depth);
+
+#ifdef PROFILING
+        time += PAPI_get_virt_usec() - t1;
+
+        if(depth == 1) {
+        	profile_cu32time.push_back(time);
+        }
+        if(depth == 2) {
+        	profile_cu16time.push_back(time);
+        }
+        if(depth == 3) {
+        	profile_cu8time.push_back(time);
+        }
+#endif
+
     }
 
     if (m_param->bEnableRdRefine && depth <= m_slice->m_pps->maxCuDQPDepth)

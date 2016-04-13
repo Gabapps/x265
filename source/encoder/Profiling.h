@@ -16,9 +16,13 @@
 #ifndef ENCODER_PROFILING_H_
 #define ENCODER_PROFILING_H_
 
-#define PATH8 "profiling_8.txt"
-#define PATH16 "profiling_16.txt"
-#define PATH32 "profiling_32.txt"
+#define PROFILING_FOLDER "./"
+
+#define PATH8 PROFILING_FOLDER"profiling_8.txt"
+#define PATH16 PROFILING_FOLDER"profiling_16.txt"
+#define PATH32 PROFILING_FOLDER"profiling_32.txt"
+
+typedef long_long profile_type;
 
 /*
 #pragma pack(push)
@@ -36,12 +40,13 @@ struct Profile_data {
 FILE* profile_file1 = NULL;
 FILE* profile_file2 = NULL;
 FILE* profile_file3 = NULL;
-std::vector<long_long> profile_cu8time;
-std::vector<long_long> profile_cu16time;
-std::vector<long_long> profile_cu32time;
+std::vector<profile_type> profile_cu8time;
+std::vector<profile_type> profile_cu16time;
+std::vector<profile_type> profile_cu32time;
 
 void profile_open();
 void profile_close();
+void profile_write();
 
 void profile_open() {
 	if(!profile_file1) {
@@ -62,6 +67,16 @@ void profile_close() {
 		fclose(profile_file3);
 		profile_file1 = NULL;
 	}
+}
+
+void profile_write() {
+	fwrite(&profile_cu8time.front(), profile_cu8time.size(), sizeof(profile_type), profile_file1);
+	fwrite(&profile_cu16time.front(), profile_cu16time.size(), sizeof(profile_type), profile_file2);
+	fwrite(&profile_cu32time.front(), profile_cu32time.size(), sizeof(profile_type), profile_file3);
+
+	profile_cu8time.clear();
+	profile_cu16time.clear();
+	profile_cu32time.clear();
 }
 
 #endif /* ENCODER_PROFILING_H_ */
