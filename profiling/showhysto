@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-for i in {2..9}
+for it in {1..20}
 do
-./histogram_papi.py $i &
+./histogram.py results/RaceHorses/4/it$it &
 done

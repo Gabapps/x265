@@ -1,7 +1,7 @@
 #!/bin/bash
 
 X265_PATH=../build/eclipse-cdt4-debug/
-VIDEOS_PATH=../video/
+VIDEOS_PATH=../inputs/
 RESULTS_PATH=results/
 
 VIDEO_NAME=RaceHorses
@@ -14,7 +14,7 @@ rm profiling*.txt 2> /dev/null
 mkdir ${RESULTS_PATH}$VIDEO_NAME 2> /dev/null
 rm ${RESULTS_PATH}${VIDEO_NAME}/* -r
 
-for i in {0..9}
+for i in {4..9}
 do
 echo "Preset $i"
 mkdir ${RESULTS_PATH}${VIDEO_NAME}/${i} 2> /dev/null
