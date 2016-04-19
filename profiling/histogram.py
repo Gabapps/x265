@@ -26,16 +26,16 @@ plt.figure().suptitle("Preset " + sys.argv[1], fontsize=20)
 if(v1.size>0) :
 	plt.subplot(311)
 	plt.title("CPU Time 8x8")
-	plt.hist(v1, bins=np.linspace(0, 200, 200))
-#	plt.hist(v1)
+#	plt.hist(v1, bins=np.linspace(0, 200, 200))
+	plt.hist(v1, bins=200)
 
 if(v2.size>0) :
 	plt.subplot(312)
 	plt.title("CPU Time 16x16")
-	plt.hist(v2, bins=np.linspace(0, 200, 200))
+	plt.hist(v2, bins=200)
 
 if(v3.size>0) :
 	plt.subplot(313)
 	plt.title("CPU Time 32x32")
-	plt.hist(v3, bins=np.linspace(0, 200, 200))
+	plt.hist(v3, bins=200)
 plt.show()
