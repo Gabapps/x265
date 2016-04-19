@@ -50,9 +50,9 @@ void profile_write();
 
 void profile_open() {
 	if(!profile_file1) {
-		profile_file1 = fopen(PATH8, "ab+");
-		profile_file2 = fopen(PATH16, "ab+");
-		profile_file3 = fopen(PATH32, "ab+");
+		profile_file1 = fopen(PATH8, "wb+");
+		profile_file2 = fopen(PATH16, "wb+");
+		profile_file3 = fopen(PATH32, "wb+");
 		profile_cu8time.reserve(4096);
 		profile_cu16time.reserve(4096);
 		profile_cu32time.reserve(4096);
