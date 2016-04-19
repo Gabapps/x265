@@ -178,6 +178,7 @@ Mode& Analysis::compressCTU(CUData& ctu, Frame& frame, const CUGeom& cuGeom, con
             memcpy(ctu.m_partSize, &intraDataCTU->partSizes[ctu.m_cuAddr * numPartition], sizeof(char) * numPartition);
             memcpy(ctu.m_chromaIntraDir, &intraDataCTU->chromaModes[ctu.m_cuAddr * numPartition], sizeof(uint8_t) * numPartition);
         }
+
         compressIntraCU(ctu, cuGeom, qp);
 
         profile_write();
@@ -296,7 +297,7 @@ void Analysis::qprdRefine(const CUData& parentCTU, const CUGeom& cuGeom, int32_t
 void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, int32_t qp)
 {
 #ifdef PROFILING
-	long_long t1 = PAPI_get_virt_usec(), time = 0;
+	long_long t1 = PAPI_get_virt_cyc(), time = 0;
 #endif
     uint32_t depth = cuGeom.depth;
     ModeDepth& md = m_modeDepth[depth];
@@ -351,77 +352,80 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
 
     if (mightSplit)
     {
-        Mode* splitPred = &md.pred[PRED_SPLIT];
-        splitPred->initCosts();
-        CUData* splitCU = &splitPred->cu;
-        splitCU->initSubCU(parentCTU, cuGeom, qp);
+    	Mode* splitPred = &md.pred[PRED_SPLIT];
+    	splitPred->initCosts();
+    	CUData* splitCU = &splitPred->cu;
+    	splitCU->initSubCU(parentCTU, cuGeom, qp);
 
-        uint32_t nextDepth = depth + 1;
-        ModeDepth& nd = m_modeDepth[nextDepth];
-        invalidateContexts(nextDepth);
-        Entropy* nextContext = &m_rqt[depth].cur;
-        int32_t nextQP = qp;
-
-        for (uint32_t subPartIdx = 0; subPartIdx < 4; subPartIdx++)
-        {
-            const CUGeom& childGeom = *(&cuGeom + cuGeom.childOffset + subPartIdx);
-            if (childGeom.flags & CUGeom::PRESENT)
-            {
-                m_modeDepth[0].fencYuv.copyPartToYuv(nd.fencYuv, childGeom.absPartIdx);
-                m_rqt[nextDepth].cur.load(*nextContext);
-
-                if (m_slice->m_pps->bUseDQP && nextDepth <= m_slice->m_pps->maxCuDQPDepth)
-                    nextQP = setLambdaFromQP(parentCTU, calculateQpforCuSize(parentCTU, childGeom));
+    	uint32_t nextDepth = depth + 1;
+    	ModeDepth& nd = m_modeDepth[nextDepth];
+    	invalidateContexts(nextDepth);
+    	Entropy* nextContext = &m_rqt[depth].cur;
+    	int32_t nextQP = qp;
 
 #ifdef PROFILING
-                time += PAPI_get_virt_usec() - t1;
+    	time += PAPI_get_virt_cyc() - t1;
 #endif
 
-                compressIntraCU(parentCTU, childGeom, nextQP);
+    	for (uint32_t subPartIdx = 0; subPartIdx < 4; subPartIdx++)
+    	{
+#ifdef PROFILING
+    		t1 = PAPI_get_virt_cyc();
+#endif
+    		const CUGeom& childGeom = *(&cuGeom + cuGeom.childOffset + subPartIdx);
+    		if (childGeom.flags & CUGeom::PRESENT)
+    		{
+    			m_modeDepth[0].fencYuv.copyPartToYuv(nd.fencYuv, childGeom.absPartIdx);
+    			m_rqt[nextDepth].cur.load(*nextContext);
+
+    			if (m_slice->m_pps->bUseDQP && nextDepth <= m_slice->m_pps->maxCuDQPDepth)
+    				nextQP = setLambdaFromQP(parentCTU, calculateQpforCuSize(parentCTU, childGeom));
 
 #ifdef PROFILING
-                t1 = PAPI_get_virt_usec();
+    			time += PAPI_get_virt_cyc() - t1;
 #endif
 
-                // Save best CU and pred data for this sub CU
-                splitCU->copyPartFrom(nd.bestMode->cu, childGeom, subPartIdx);
-                splitPred->addSubCosts(*nd.bestMode);
-                nd.bestMode->reconYuv.copyToPartYuv(splitPred->reconYuv, childGeom.numPartitions * subPartIdx);
-                nextContext = &nd.bestMode->contexts;
-            }
-            else
-            {
-                /* record the depth of this non-present sub-CU */
-                splitCU->setEmptyPart(childGeom, subPartIdx);
-
-                /* Set depth of non-present CU to 0 to ensure that correct CU is fetched as reference to code deltaQP */
-                if (bAlreadyDecided)
-                    memset(parentCTU.m_cuDepth + childGeom.absPartIdx, 0, childGeom.numPartitions);
-            }
-        }
-        nextContext->store(splitPred->contexts);
-        if (mightNotSplit)
-            addSplitFlagCost(*splitPred, cuGeom.depth);
-        else
-            updateModeCost(*splitPred);
-
-        checkDQPForSplitPred(*splitPred, cuGeom);
-        checkBestMode(*splitPred, depth);
+    			compressIntraCU(parentCTU, childGeom, nextQP);
 
 #ifdef PROFILING
-        time += PAPI_get_virt_usec() - t1;
-
-        if(depth == 1) {
-        	profile_cu32time.push_back(time);
-        }
-        if(depth == 2) {
-        	profile_cu16time.push_back(time);
-        }
-        if(depth == 3) {
-        	profile_cu8time.push_back(time);
-        }
+    			t1 = PAPI_get_virt_cyc();
 #endif
 
+    			// Save best CU and pred data for this sub CU
+    			splitCU->copyPartFrom(nd.bestMode->cu, childGeom, subPartIdx);
+    			splitPred->addSubCosts(*nd.bestMode);
+    			nd.bestMode->reconYuv.copyToPartYuv(splitPred->reconYuv, childGeom.numPartitions * subPartIdx);
+    			nextContext = &nd.bestMode->contexts;
+
+#ifdef PROFILING
+    			time += PAPI_get_virt_cyc() - t1;
+    			t1 = PAPI_get_virt_cyc();
+#endif
+    		}
+    		else
+    		{
+    			/* record the depth of this non-present sub-CU */
+    			splitCU->setEmptyPart(childGeom, subPartIdx);
+
+    			/* Set depth of non-present CU to 0 to ensure that correct CU is fetched as reference to code deltaQP */
+    			if (bAlreadyDecided)
+    				memset(parentCTU.m_cuDepth + childGeom.absPartIdx, 0, childGeom.numPartitions);
+    		}
+#ifdef PROFILING
+    		time += PAPI_get_virt_cyc() - t1;
+#endif
+    	}
+#ifdef PROFILING
+    	t1 = PAPI_get_virt_cyc();
+#endif
+    	nextContext->store(splitPred->contexts);
+    	if (mightNotSplit)
+    		addSplitFlagCost(*splitPred, cuGeom.depth);
+    	else
+    		updateModeCost(*splitPred);
+
+    	checkDQPForSplitPred(*splitPred, cuGeom);
+    	checkBestMode(*splitPred, depth);
     }
 
     if (m_param->bEnableRdRefine && depth <= m_slice->m_pps->maxCuDQPDepth)
@@ -434,6 +438,20 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
     md.bestMode->cu.copyToPic(depth);
     if (md.bestMode != &md.pred[PRED_SPLIT])
         md.bestMode->reconYuv.copyToPicYuv(*m_frame->m_reconPic, parentCTU.m_cuAddr, cuGeom.absPartIdx);
+
+#ifdef PROFILING
+        time += PAPI_get_virt_cyc() - t1;
+
+        if(depth == 1) {
+        	profile_cu32time.push_back(time);
+        }
+        if(depth == 2) {
+        	profile_cu16time.push_back(time);
+        }
+        if(depth == 3) {
+        	profile_cu8time.push_back(time);
+        }
+#endif
 }
 
 void Analysis::PMODE::processTasks(int workerThreadId)
