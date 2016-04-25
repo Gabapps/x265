@@ -179,7 +179,9 @@ Mode& Analysis::compressCTU(CUData& ctu, Frame& frame, const CUGeom& cuGeom, con
             memcpy(ctu.m_chromaIntraDir, &intraDataCTU->chromaModes[ctu.m_cuAddr * numPartition], sizeof(uint8_t) * numPartition);
         }
 
+        profile_lock();
         compressIntraCU(ctu, cuGeom, qp);
+        profile_unlock();
 
         profile_write();
     }
@@ -442,14 +444,16 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
 #ifdef PROFILING
         time += PAPI_get_virt_cyc() - t1;
 
+    	uint32_t id = cuGeom.absPartIdx;
+
         if(depth == 1) {
-        	profile_cu32time.push_back(time);
+        	profile_cu32time[id/64] = time;
         }
         if(depth == 2) {
-        	profile_cu16time.push_back(time);
+        	profile_cu16time[id/16] = time;
         }
         if(depth == 3) {
-        	profile_cu8time.push_back(time);
+        	profile_cu8time[id/4] = time;
         }
 #endif
 }

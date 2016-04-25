@@ -11,6 +11,10 @@ if(len(sys.argv) != 2):
 v1 = np.fromfile(sys.argv[1]+"/profiling_8.txt", dtype=np.int64)
 v2 = np.fromfile(sys.argv[1]+"/profiling_16.txt", dtype=np.int64)
 v3 = np.fromfile(sys.argv[1]+"/profiling_32.txt", dtype=np.int64)
+v1 = v1[v1 != 0]
+v2 = v2[v2 != 0]
+v3 = v3[v3 != 0]
+
 #b1 = v['state'] == 2;
 #b2 = v['time'] < 3000;
 
@@ -27,15 +31,15 @@ if(v1.size>0) :
 	plt.subplot(311)
 	plt.title("CPU Time 8x8")
 #	plt.hist(v1, bins=np.linspace(0, 200, 200))
-	plt.hist(v1, bins=200)
+	plt.hist(v1, bins=400)
 
 if(v2.size>0) :
 	plt.subplot(312)
 	plt.title("CPU Time 16x16")
-	plt.hist(v2, bins=200)
+	plt.hist(v2, bins=400)
 
 if(v3.size>0) :
 	plt.subplot(313)
 	plt.title("CPU Time 32x32")
-	plt.hist(v3, bins=200)
+	plt.hist(v3, bins=400)
 plt.show()

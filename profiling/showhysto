@@ -1,7 +1,10 @@
 #!/bin/bash
 
+VIDEO_NAME=RaceHorses
+PRESET=7
 
-for it in {1..20}
+
+for it in {4..6}
 do
-./histogram.py results/RaceHorses/4/it$it &
+./histogram.py results/${VIDEO_NAME}/${PRESET}/it$it &
 done
