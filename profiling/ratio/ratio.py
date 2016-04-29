@@ -1,29 +1,29 @@
 #!/usr/bin/python
 
+import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-if(len(sys.argv) != 2):
-        print "Need preset num"
+if(len(sys.argv) != 3):
+        print "<path> <cusize-x>"
         exit()
 
-v1 = np.fromfile(sys.argv[1]+"/profiling_8.txt", dtype=np.int64)
-v2 = np.fromfile(sys.argv[1]+"/profiling_16.txt", dtype=np.int64)
-v1 = v1[v1 != 0]
-v2 = v2[v2 != 0]
+#os.system("sh convert_to_sum.py " + sys.argv[1])
 
-vadd16 = np.ndarray([1, 1, 0, 0, 1, 1, 0, 0])
-vadd8 = np.ndarray([1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0])
+v1 = np.fromfile(sys.argv[1]+"/profiling_" + sys.argv[2] + ".txt", dtype=np.int64)
+v2 = np.fromfile("profiling_" + sys.argv[2] + ".txt", dtype=np.int64)
 
-vout16 = np.ndarray(v1)
-vout8 = np.ndarray(v2)
+mask1 = (v1 != 0)
+mask2 = (v2 != 0)
 
-for i in range(0, v1.size):
-	vout16[i] = vadd16 * v1[:].T
+mask = np.ma.mask_or(mask1, mask2)
 
-for i in range(0, v2.size):
-	
+vout1 = v1[mask]
+vout2 = v2[mask]
 
-vout16.tofile("profiling_32_sum.txt")
-vout8.tofile("profiling_16_sum.txt")
+print v1.size
+print v2.size
+
+plt.scatter(vout1,vout2)
+plt.show()

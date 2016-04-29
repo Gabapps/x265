@@ -14,7 +14,7 @@ rm profiling*.txt 2> /dev/null
 mkdir ${RESULTS_PATH}$VIDEO_NAME 2> /dev/null
 #rm ${RESULTS_PATH}${VIDEO_NAME}/* -r
 
-for j in {1..10}
+for j in {1..20}
 do
 echo "iteration $j"
 mkdir ${RESULTS_PATH}${VIDEO_NAME}/it${j} 2> /dev/null
