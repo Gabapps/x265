@@ -1,0 +1,10 @@
+#!/bin/bash
+
+./execute-x265 Keiba_416x240_30 416x240 30
+./execute-x265 RaceHorses_832x480_30 832x480 30
+./execute-x265 BQTerrace_1920x1080_60 1920x1080 60
+./execute-x265 BasketballDrive_1920x1080_50 1920x1080 50
+./execute-x265 Flowervase_832x480_30 832x480 30
+./execute-x265 FourPeople_1280x720_60 1280x720 60
+./execute-x265 PartyScene_832x480_50 832x480 50
+./execute-x265 SlideEditing_1280x720_30 1280x720 30

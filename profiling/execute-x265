@@ -10,7 +10,7 @@ VIDEO_FPS=$3
 
 [ -z "$1" ] && echo "<name> <res> <fps>" && ls $VIDEOS_PATH && exit
 
-rm profiling*.txt 2> /dev/null
+rm cycle_counts*.bin 2> /dev/null
 mkdir ${RESULTS_PATH}$VIDEO_NAME 2> /dev/null
 #rm ${RESULTS_PATH}${VIDEO_NAME}/* -r
 
@@ -19,9 +19,9 @@ do
 echo "iteration $j"
 mkdir ${RESULTS_PATH}${VIDEO_NAME}/it${j} 2> /dev/null
 
-${X265_PATH}x265 ${VIDEOS_PATH}${VIDEO_NAME}_${VIDEO_RES}_${VIDEO_FPS}.yuv ${VIDEOS_PATH}out.hevc --input-res $VIDEO_RES  -I 1 --fps $VIDEO_FPS --log-level 0 -F 1 --no-wpp --no-pmode --lookahead-slices 0
+${X265_PATH}x265 ${VIDEOS_PATH}${VIDEO_NAME}.yuv ${VIDEOS_PATH}out.hevc --input-res $VIDEO_RES  -I 1 --fps $VIDEO_FPS --log-level 0 -F 1 --no-wpp --no-pmode --lookahead-slices 0
 #./x265 ../video/BasketballDrive_1920x1080_50.yuv ../video/out.hevc --input-res 1920x1080  -I 1 --fps 50 -p $i --no-wpp --log-level 0
-mv profiling*.txt ${RESULTS_PATH}${VIDEO_NAME}/it${j}
+mv cycle_counts*.bin ${RESULTS_PATH}${VIDEO_NAME}/iter_${j}
 #./x265 ../video/simple_test.yuv ../video/out.hevc --input-res 256x256  -I 1 --fps 1 -p $1 --no-wpp --log-level 0
 done
 #../../../profileread
