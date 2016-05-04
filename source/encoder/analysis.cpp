@@ -299,7 +299,7 @@ void Analysis::qprdRefine(const CUData& parentCTU, const CUGeom& cuGeom, int32_t
 void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, int32_t qp)
 {
 #ifdef PROFILING
-	long_long t1 = PAPI_get_virt_cyc(), time = 0;
+	long_long t1 = (long)PAPI_get_virt_cyc(), time = 0;
 #endif
     uint32_t depth = cuGeom.depth;
     ModeDepth& md = m_modeDepth[depth];
@@ -366,13 +366,13 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
     	int32_t nextQP = qp;
 
 #ifdef PROFILING
-    	time += PAPI_get_virt_cyc() - t1;
+    	time += (long)PAPI_get_virt_cyc() - t1;
 #endif
 
     	for (uint32_t subPartIdx = 0; subPartIdx < 4; subPartIdx++)
     	{
 #ifdef PROFILING
-    		t1 = PAPI_get_virt_cyc();
+    		t1 = (long)PAPI_get_virt_cyc();
 #endif
     		const CUGeom& childGeom = *(&cuGeom + cuGeom.childOffset + subPartIdx);
     		if (childGeom.flags & CUGeom::PRESENT)
@@ -384,13 +384,13 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
     				nextQP = setLambdaFromQP(parentCTU, calculateQpforCuSize(parentCTU, childGeom));
 
 #ifdef PROFILING
-    			time += PAPI_get_virt_cyc() - t1;
+    			time += (long)PAPI_get_virt_cyc() - t1;
 #endif
 
     			compressIntraCU(parentCTU, childGeom, nextQP);
 
 #ifdef PROFILING
-    			t1 = PAPI_get_virt_cyc();
+    			t1 = (long)PAPI_get_virt_cyc();
 #endif
 
     			// Save best CU and pred data for this sub CU
@@ -400,8 +400,8 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
     			nextContext = &nd.bestMode->contexts;
 
 #ifdef PROFILING
-    			time += PAPI_get_virt_cyc() - t1;
-    			t1 = PAPI_get_virt_cyc();
+    			time += (long)PAPI_get_virt_cyc() - t1;
+    			t1 = (long)PAPI_get_virt_cyc();
 #endif
     		}
     		else
@@ -414,11 +414,11 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
     				memset(parentCTU.m_cuDepth + childGeom.absPartIdx, 0, childGeom.numPartitions);
     		}
 #ifdef PROFILING
-    		time += PAPI_get_virt_cyc() - t1;
+    		time += (long)PAPI_get_virt_cyc() - t1;
 #endif
     	}
 #ifdef PROFILING
-    	t1 = PAPI_get_virt_cyc();
+    	t1 = (long)PAPI_get_virt_cyc();
 #endif
     	nextContext->store(splitPred->contexts);
     	if (mightNotSplit)
@@ -442,7 +442,7 @@ void Analysis::compressIntraCU(const CUData& parentCTU, const CUGeom& cuGeom, in
         md.bestMode->reconYuv.copyToPicYuv(*m_frame->m_reconPic, parentCTU.m_cuAddr, cuGeom.absPartIdx);
 
 #ifdef PROFILING
-        time += PAPI_get_virt_cyc() - t1;
+        time += (long)PAPI_get_virt_cyc() - t1;
 
     	uint32_t id = cuGeom.absPartIdx;
 

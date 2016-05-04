@@ -20,11 +20,11 @@
 
 #define PROFILING_FOLDER "./"
 
-#define PATH8 PROFILING_FOLDER"profiling_8.txt"
-#define PATH16 PROFILING_FOLDER"profiling_16.txt"
-#define PATH32 PROFILING_FOLDER"profiling_32.txt"
+#define PATH8 PROFILING_FOLDER"cycle_counts_CU8.bin"
+#define PATH16 PROFILING_FOLDER"cycle_counts_CU16.bin"
+#define PATH32 PROFILING_FOLDER"cycle_counts_CU32.bin"
 
-typedef long_long profile_type;
+typedef long profile_type;
 
 /*
 #pragma pack(push)
