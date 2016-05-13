@@ -1,10 +1,21 @@
 #!/bin/bash
 
-./execute-x265 Keiba_416x240_30 416x240 30
 ./execute-x265 RaceHorses_832x480_30 832x480 30
 ./execute-x265 BQTerrace_1920x1080_60 1920x1080 60
 ./execute-x265 BasketballDrive_1920x1080_50 1920x1080 50
 ./execute-x265 Flowervase_832x480_30 832x480 30
 ./execute-x265 FourPeople_1280x720_60 1280x720 60
 ./execute-x265 PartyScene_832x480_50 832x480 50
-./execute-x265 SlideEditing_1280x720_30 1280x720 30
+./execute-x265 Traffic_3840x2048_30p_crop 3840x2048 30
+./execute-x265 PeopleOnStreet_2560x1600_30_crop 2560x1600 30
+./execute-x265 Kimono1_1920x1080_24_30 1280x720 30
+./execute-x265 ParkScene_1920x1080_24 1920x1080 24
+./execute-x265 Cactus_1920x1080_50 1920x1080 50
+./execute-x265 BQMall_832x480_60 832x480 60
+./execute-x265 BasketballDrill_832x480_50 832x480 50
+./execute-x265 RaceHorses_416x240_30 416x240 30
+./execute-x265 BQSquare_416x240_60 416x240 60
+./execute-x265 BlowingBubbles_416x240_50 416x240 50
+./execute-x265 BasketballPass_416x240_50 416x240 50
+./execute-x265 Johnny_1280x720_60 1280x720 60
+./execute-x265 KristenAndSara_1280x720_60 1280x720 60
